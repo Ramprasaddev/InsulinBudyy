@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardPreventCornerOverlap="false"
+                android:layout_marginBottom="25dp">
+
+                <ImageView
+                    android:id="@+id/welcomeImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/theme_image" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Welcome to Your Personal Insulin Assistant"
+                android:textColor="@android:color/black"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Track, predict, and manage your insulin easily and safely"
+                android:textColor="@android:color/black"
+                android:textFontWeight="@integer/material_motion_duration_medium_2"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/nextButton"
+                android:layout_width="170dp"
+                android:layout_height="43dp"
+                android:layout_gravity="center"
+                android:layout_margin="40dp"
+                android:backgroundTint="#6A1B9A"
+                android:fontFamily="sans-serif-condensed-medium"
+                android:text="Next"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </ScrollView>

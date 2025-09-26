@@ -1,0 +1,136 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
+                android:gravity="center_horizontal"
+                android:padding="24dp">
+
+                <!-- Top spacing -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp" />
+
+                <!-- Avatar Image -->
+                <ImageView
+                    android:id="@+id/avatarImage"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:src="@drawable/avatar_male"
+                    android:contentDescription="Profile Avatar"
+                    android:background="@drawable/circle_background"
+                    android:padding="8dp"
+                    android:elevation="4dp" />
+
+                <!-- Name -->
+                <TextView
+                    android:id="@+id/profileName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ram Prasad"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="16dp" />
+
+                <!-- Update Profile Option -->
+                <LinearLayout
+                    android:id="@+id/editProfileLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="32dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="#1A73E8" />
+
+                    <TextView
+                        android:id="@+id/editProfileText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Update Profile"
+                        android:textColor="@color/black"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="20sp"
+                        android:layout_marginStart="12dp" />
+                </LinearLayout>
+
+                <!-- User Support Option -->
+                <LinearLayout
+                    android:id="@+id/userSupportLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_help"
+                        app:tint="#1A73E8" />
+
+                    <TextView
+                        android:id="@+id/userSupport"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="User Support"
+                        android:textColor="@color/black"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="20sp"
+                        android:layout_marginStart="12dp" />
+                </LinearLayout>
+
+                <!-- About Option -->
+                <LinearLayout
+                    android:id="@+id/aboutLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_info_details"
+                        app:tint="#1A73E8" />
+
+                    <TextView
+                        android:id="@+id/about"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="About"
+                        android:textColor="@color/black"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="20sp"
+                        android:layout_marginStart="12dp" />
+                </LinearLayout>
+
+                <!-- Logout Button -->
+                <Button
+                    android:id="@+id/btnLogout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Logout"
+                    android:textSize="20sp"
+                    android:layout_marginTop="40dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:backgroundTint="@color/design_default_color_primary"
+                    android:textColor="@android:color/white"
+                    android:layout_marginBottom="30dp"
+                />
+
+            </LinearLayout>

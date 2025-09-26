@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#FFFF"> <!-- Light Blue Background -->
+
+    <!-- App Icon -->
+
+    <!-- App Title -->
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="237dp"
+        android:layout_height="268dp"
+        android:layout_marginBottom="20dp"
+        android:contentDescription="App Icon"
+        android:src="@drawable/app_icon" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Insulin Buddy"
+        android:textSize="26sp"
+        android:textColor="#1A237E"
+    android:textStyle="bold"
+    android:fontFamily="sans-serif-medium"
+    android:layout_marginTop="8dp" />
+
+    <!-- Tagline -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+
+        android:fontFamily="cursive"
+        android:text="Smart Insulin Support Made Simple"
+        android:textColor="#37474F"
+        android:textSize="16sp" />
+</LinearLayout>

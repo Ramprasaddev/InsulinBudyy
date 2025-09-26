@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6F9FF"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="User Support and Education"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#0C3C82"
+            android:paddingBottom="18dp"
+            android:gravity="center"
+            android:padding="12dp"
+            android:backgroundTint="@color/blue_200"
+            android:background="#DDE8FF"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 1. Basics of Insulin -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <ImageView
+                    android:id="@+id/image_basics"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_basics" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:text="1) Basics of Insulin Use"
+                    android:textColor="#102A43"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="6dp"
+                    android:text="• Wash hands and clean skin before injecting.\n• Prime pens/syringes if required.\n• Confirm dose carefully and inject at 90° (or 45° if very lean).\n• Hold 10 seconds before removing needle to ensure full dose.\n• Follow your clinician’s instructions; this app does not replace medical advice."
+                    android:textColor="#455A64"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal"
+                    android:paddingTop="10dp">
+
+                    <Button
+                        android:id="@+id/btnVideo1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="Watch Video" />
+
+                    <Space
+                        android:layout_width="8dp"
+                        android:layout_height="0dp" />
+
+                    <Button
+                        android:id="@+id/btnArticle1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="Read Article" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 2. Injection Sites & Rotation -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_injection"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_injection" />
+
+                <TextView
+                    android:text="2) Injection Sites and Rotation"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#102A43"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:text="Common sites: abdomen, thigh, upper arm, buttocks. Rotate within and between sites to prevent lipohypertrophy. Avoid scars, moles, or irritated skin."
+                    android:textColor="#455A64"
+                    android:textSize="14sp"
+                    android:paddingTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnVideo2"
+                        android:text="Watch Video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                    <Space android:layout_width="8dp" android:layout_height="0dp"/>
+
+                    <Button
+                        android:id="@+id/btnArticle2"
+                        android:text="Read Article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 3. ICR -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_icr"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_icr" />
+
+                <TextView
+                    android:text="3) Insulin-to-Carb Ratio (ICR)"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#102A43"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:text="ICR estimates how many grams of carbs are covered by 1 unit of insulin. Example: ICR 1:10 → 1 unit for every 10g carbs. Work with your clinician to set/adjust."
+                    android:textColor="#455A64"
+                    android:textSize="14sp"
+                    android:paddingTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnVideo3"
+                        android:text="Watch Video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                    <Space android:layout_width="8dp" android:layout_height="0dp"/>
+
+                    <Button
+                        android:id="@+id/btnArticle3"
+                        android:text="Read Article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 4. ISF -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_isf"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_isf" />
+
+                <TextView
+                    android:text="4) Insulin Sensitivity Factor (ISF)"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#102A43"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:text="ISF (correction factor) tells how much 1 unit of insulin will lower your blood glucose (e.g., 1 unit lowers 50 mg/dL). Used to correct highs along with target BG."
+                    android:textColor="#455A64"
+                    android:textSize="14sp"
+                    android:paddingTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnVideo4"
+                        android:text="Watch Video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                    <Space android:layout_width="8dp" android:layout_height="0dp"/>
+
+                    <Button
+                        android:id="@+id/btnArticle4"
+                        android:text="Read Article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 5. Type 1 -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_type1"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_type1" />
+
+                <TextView
+                    android:text="5) Type 1 Diabetes Essentials"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#102A43"
+                    android:paddingTop="10dp" />
+
+                <TextView
+                    android:text="Autoimmune condition with little/no insulin production. Requires daily insulin. Focus on carb counting, ICR/ISF tuning, frequent BG checks, and sick-day rules."
+                    android:textColor="#455A64"
+                    android:textSize="14sp"
+                    android:paddingTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnVideo5"
+                        android:text="Watch Video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                    <Space android:layout_width="8dp" android:layout_height="0dp"/>
+
+                    <Button
+                        android:id="@+id/btnArticle5"
+                        android:text="Read Article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 6. Type 2 -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_type2"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_type2" />
+
+                <TextView
+                    android:text="6) Type 2 Diabetes Essentials"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#102A43"
+                    android:paddingTop="10dp" />
+
+                <TextView
+                    android:text="Often insulin resistance first; may need lifestyle, meds, and sometimes insulin. Emphasize weight management, activity, and individualized targets."
+                    android:textColor="#455A64"
+                    android:textSize="14sp"
+                    android:paddingTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnVideo6"
+                        android:text="Watch Video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                    <Space android:layout_width="8dp" android:layout_height="0dp"/>
+
+                    <Button
+                        android:id="@+id/btnArticle6"
+                        android:text="Read Article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 7. Hypoglycemia -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_hypo"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_hypo" />
+
+                <TextView
+                    android:text="7) Hypoglycemia (Low BG)"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#102A43"
+                    android:paddingTop="10dp" />
+
+                <TextView
+                    android:text="Symptoms: shakiness, sweating, confusion. Treat with 15g fast carbs (juice/glucose tabs), recheck in 15 min, repeat if needed, then eat a snack."
+                    android:textColor="#455A64"
+                    android:textSize="14sp"
+                    android:paddingTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnVideo7"
+                        android:text="Watch Video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                    <Space android:layout_width="8dp" android:layout_height="0dp"/>
+
+                    <Button
+                        android:id="@+id/btnArticle7"
+                        android:text="Read Article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 8. Hyperglycemia -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_hyper"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_hyper" />
+
+                <TextView
+                    android:text="8) Hyperglycemia (High BG)"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#102A43"
+                    android:paddingTop="10dp" />
+
+                <TextView
+                    android:text="Check for ketones if very high or if sick. Use correction insulin per ISF and hydrate. Seek medical help with persistent vomiting, ketones, or very high readings."
+                    android:textColor="#455A64"
+                    android:textSize="14sp"
+                    android:paddingTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnVideo8"
+                        android:text="Watch Video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                    <Space android:layout_width="8dp" android:layout_height="0dp"/>
+
+                    <Button
+                        android:id="@+id/btnArticle8"
+                        android:text="Read Article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 9. Storage & Handling -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_storage"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_storage" />
+
+                <TextView
+                    android:text="9) Insulin Storage and Handling"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#102A43"
+                    android:paddingTop="10dp" />
+
+                <TextView
+                    android:text="Unopened insulin in fridge (not frozen). Opened pens often stable at room temp (check brand guidance). Protect from heat/sunlight. Check expiration always."
+                    android:textColor="#455A64"
+                    android:textSize="14sp"
+                    android:paddingTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnVideo9"
+                        android:text="Watch Video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                    <Space android:layout_width="8dp" android:layout_height="0dp"/>
+
+                    <Button
+                        android:id="@+id/btnArticle9"
+                        android:text="Read Article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 10. Lifestyle -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_lifestyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/support_lifestyle" />
+
+                <TextView
+                    android:text="10) Lifestyle and Self-Care"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#102A43"
+                    android:paddingTop="10dp" />
+
+                <TextView
+                    android:text="Balanced meals, regular activity, hydration, adequate sleep, and stress control help stabilize glucose. Track patterns and review with your care team."
+                    android:textColor="#455A64"
+                    android:textSize="14sp"
+                    android:paddingTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnVideo10"
+                        android:text="Watch Video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                    <Space android:layout_width="8dp" android:layout_height="0dp"/>
+
+                    <Button
+                        android:id="@+id/btnArticle10"
+                        android:text="Read Article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Disclaimer -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Disclaimer: Educational content only. Always follow your clinician’s advice."
+            android:textColor="#6B7280"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:paddingBottom="8dp"/>
+    </LinearLayout>
+</ScrollView>
