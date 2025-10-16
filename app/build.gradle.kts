@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.saveetha.insulinbuddy"
+    namespace = "com.simats.insulinbuddy"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.saveetha.insulinbuddy"
+        applicationId = "com.simats.insulinbuddy"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -49,13 +49,16 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("androidx.core:core-ktx:1.12.0")
-
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
     // Removed WorkManager dependency as requested, which is often used for notifications
     // Removed duplicated and conflicting dependencies for a cleaner build
 
     implementation(libs.volley)
     implementation(libs.play.services.cast.framework)
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation(libs.mediation.test.suite)
 
     // Testing dependencies
     testImplementation(libs.junit)

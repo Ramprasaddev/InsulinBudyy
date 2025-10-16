@@ -1,10 +1,10 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.saveetha.insulinbuddy.utils.SessionManager
+import com.simats.insulinbuddy.SessionManager
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import org.json.JSONObject
@@ -30,10 +30,14 @@ class ProfileActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
         val username = sessionManager.getUsername()
-
         if (username != null) {
-            // show username immediately
+            // Show cached username and gender immediately for fast UX
             profileName.text = username
+            val cachedGender = sessionManager.getGender()
+            if (cachedGender != null) {
+                setAvatar(cachedGender)
+            }
+            // Also refresh from server in background to keep it up to date
             fetchGenderFromServer(username)
         } else {
             Toast.makeText(this, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
@@ -63,7 +67,7 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun fetchGenderFromServer(username: String) {
-        val url = "https://606tr6vg-80.inc1.devtunnels.ms/INSULIN/get_user_profile.php"
+        val url = "http://14.139.187.229:8081/PDD-2025(9thmonth)/InsulinBuddy/get_user_profile.php"
 
         val json = JSONObject().apply {
             put("username", username)
@@ -90,12 +94,8 @@ class ProfileActivity : AppCompatActivity() {
                     runOnUiThread {
                         if (jsonObject.optString("status") == "success") {
                             val gender = jsonObject.optString("gender", "male")
-                            avatarImage.setImageResource(
-                                if (gender.equals("female", ignoreCase = true))
-                                    R.drawable.avatar_female
-                                else
-                                    R.drawable.avatar_male
-                            )
+                            sessionManager.setGender(if (gender.equals("female", true)) "Female" else "Male")
+                            setAvatar(gender)
                         } else {
                             Toast.makeText(this@ProfileActivity, "User not found", Toast.LENGTH_SHORT).show()
                         }
@@ -112,5 +112,10 @@ class ProfileActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun setAvatar(gender: String) {
+        val isFemale = gender.equals("female", true) || gender.equals("Female", true)
+        avatarImage.setImageResource(if (isFemale) R.drawable.avatar_female else R.drawable.avatar_male)
     }
 }

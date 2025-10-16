@@ -2,81 +2,136 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E9F4FF">
+    android:padding="16dp"
+    android:fillViewport="true"
+    android:background="#F3F8FF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
         android:orientation="vertical">
-
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="PREDICTOR"
-            android:textSize="22sp"
+            android:textSize="42sp"
             android:textStyle="bold"
             android:gravity="center"
             android:textColor="#274E9C"
             android:paddingBottom="20dp"/>
-
+        <!-- Current Glucose -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Current Glucose (mg/dL)"
+            android:textColor="#0D47A1"
+            android:textSize="16sp"
+            android:paddingTop="8dp"/>
         <EditText
             android:id="@+id/glucoseEditText"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:hint="Current Glucose (mg/dL)"
-            android:inputType="numberDecimal"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text" />
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="e.g. 120"
+            android:background="@drawable/edittext_bg"
+            android:padding="12dp"/>
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="12dp" />
-
+        <!-- Carbs Intake -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Carbs Intake (grams)"
+            android:textColor="#0D47A1"
+            android:textSize="16sp"
+            android:paddingTop="12dp"/>
         <EditText
             android:id="@+id/carbsEditText"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:hint="Carbohydrates (g)"
-            android:inputType="numberDecimal"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text" />
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="e.g. 60"
+            android:background="@drawable/edittext_bg"
+            android:padding="12dp"/>
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="12dp" />
-
-        <!-- Activity Spinner -->
-        <Spinner
-            android:id="@+id/activitySpinner"
+        <!-- Activity Minutes -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activity (minutes)"
+            android:textColor="#0D47A1"
+            android:textSize="16sp"
+            android:paddingTop="12dp"/>
+        <EditText
+            android:id="@+id/activityEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:spinnerMode="dropdown"/>
+            android:inputType="number"
+            android:hint="e.g. 30"
+            android:background="@drawable/edittext_bg"
+            android:padding="12dp"/>
 
-        <!-- Meal Type Spinner -->
+        <!-- Stress Level -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stress Level"
+            android:textColor="#0D47A1"
+            android:textSize="16sp"
+            android:paddingTop="12dp"/>
+        <Spinner
+            android:id="@+id/stressSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/spinner_bg"
+            android:padding="12dp"/>
+
+        <!-- Meal Type -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Meal Type"
+            android:textColor="#0D47A1"
+            android:textSize="16sp"
+            android:paddingTop="12dp"/>
         <Spinner
             android:id="@+id/mealTypeSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:spinnerMode="dropdown"/>
+            android:background="@drawable/spinner_bg"
+            android:padding="12dp"/>
 
-        <Space
+        <!-- Notes -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notes (optional)"
+            android:textColor="#0D47A1"
+            android:textSize="16sp"
+            android:paddingTop="12dp"/>
+        <EditText
+            android:id="@+id/notesEditText"
             android:layout_width="match_parent"
-            android:layout_height="18dp" />
+            android:layout_height="wrap_content"
+            android:hint="Any additional info..."
+            android:background="@drawable/edittext_bg"
+            android:padding="12dp"
+            android:inputType="textMultiLine"
+            android:minLines="3"/>
 
+        <!-- Submit Button -->
         <Button
             android:id="@+id/submitBtn"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="SUBMIT"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:backgroundTint="#3F51B5"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="10dp"
-            android:stateListAnimator="@null"
-            android:gravity="center"/>
+            android:layout_height="wrap_content"
+            android:text="Get Prediction"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#1976D2"
+            android:padding="14dp"
+            android:textSize="16sp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:textStyle="bold"/>
+
     </LinearLayout>
 </ScrollView>

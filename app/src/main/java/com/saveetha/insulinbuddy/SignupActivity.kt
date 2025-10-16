@@ -1,110 +1,160 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Patterns
+import android.text.Editable
+import android.text.InputType
+import android.text.TextWatcher
 import android.widget.*
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import org.json.JSONObject
-import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
-import kotlin.concurrent.thread
+import com.simats.insulinbuddy.R
+import com.simats.insulinbuddy.ApiClient
+import com.simats.insulinbuddy.SignUpRequest
+import com.simats.insulinbuddy.SignUpResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignupActivity : AppCompatActivity() {
 
-    private lateinit var nameField: EditText
-    private lateinit var usernameField: EditText
-    private lateinit var emailField: EditText
-    private lateinit var passwordField: EditText
-    private lateinit var reenterPasswordField: EditText
-    private lateinit var signupButton: Button
-    private lateinit var backToLoginButton: Button
+    private lateinit var inputFullName: EditText
+    private lateinit var inputUsername: EditText
+    private lateinit var inputEmail: EditText
+    private lateinit var inputPassword: EditText
+    private lateinit var inputConfirmPassword: EditText
+    private lateinit var togglePassword: ImageView
+    private var isPasswordVisible = false
+    private lateinit var btnCreateAccount: Button
+    private lateinit var linkLogin: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
 
-        nameField = findViewById(R.id.nameEditText)
-        usernameField = findViewById(R.id.usernameEditText)
-        emailField = findViewById(R.id.emailEditText)
-        passwordField = findViewById(R.id.passwordEditText)
-        reenterPasswordField = findViewById(R.id.reenterPasswordEditText)
-        signupButton = findViewById(R.id.submitButton)
-        backToLoginButton = findViewById(R.id.backToLoginButton)
+        inputFullName = findViewById(R.id.nameEditText)
+        inputUsername = findViewById(R.id.usernameEditText)
+        inputEmail = findViewById(R.id.emailEditText)
+        inputPassword = findViewById(R.id.passwordEditText)
+        inputConfirmPassword = findViewById(R.id.reenterPasswordEditText)
+        togglePassword = findViewById(R.id.togglePassword)
+        btnCreateAccount = findViewById(R.id.submitButton)
+        linkLogin = findViewById(R.id.backToLoginButton)
 
-        signupButton.setOnClickListener {
-            val name = nameField.text.toString().trim()
-            val username = usernameField.text.toString().trim()
-            val email = emailField.text.toString().trim()
-            val password = passwordField.text.toString()
-            val rePassword = reenterPasswordField.text.toString()
-
-            when {
-                name.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty() || rePassword.isEmpty() ->
-                    showToast("Please fill in all fields")
-                !Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
-                    showToast("Enter a valid email address")
-                !isStrongPassword(password) ->
-                    showToast("Password must include letter, number, and special character")
-                password != rePassword ->
-                    showToast("Passwords do not match")
-                else -> {
-                    // 🔄 Call backend API
-                    registerUser(name, username, email, password)
-                }
+        // 🔹 Toggle Password Visibility
+        togglePassword.setOnClickListener {
+            isPasswordVisible = !isPasswordVisible
+            if (isPasswordVisible) {
+                inputPassword.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye)
+            } else {
+                inputPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye_off)
             }
+            inputPassword.setSelection(inputPassword.text.length)
         }
 
-        backToLoginButton.setOnClickListener {
+        // 🔹 Name validation
+        inputFullName.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val name = s.toString().trim()
+                if (name.isNotEmpty() && !name.matches(Regex("^[A-Za-z ]+$"))) {
+                    inputFullName.error = "Only letters allowed"
+                } else {
+                    inputFullName.error = null
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        // 🔹 Email validation
+        val emailRegex = Regex(
+            "^(?![.])[A-Za-z0-9+_.-]+(?<![.])@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.(com|in|org|net|edu|gov|co|io|tech|ai))$"
+        )
+        inputEmail.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val email = s.toString().trim()
+                if (email.isNotEmpty() && !emailRegex.matches(email)) {
+                    inputEmail.error = "Invalid email format"
+                } else {
+                    inputEmail.error = null
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        // 🔹 Password validation
+        inputPassword.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val password = s.toString()
+                when {
+                    password.contains(" ") -> inputPassword.error = "No spaces allowed"
+                    password.isNotEmpty() && password.length < 6 -> inputPassword.error = "Min 6 characters"
+                    else -> inputPassword.error = null
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        // 🔹 Signup button click
+        btnCreateAccount.setOnClickListener {
+            Log.d("SignupActivity", "Sign up button clicked")
+            val fullName = inputFullName.text.toString().trim()
+            val username = inputUsername.text.toString().trim()
+            val email = inputEmail.text.toString().trim()
+            val password = inputPassword.text.toString().trim()
+            val confirm = inputConfirmPassword.text.toString().trim()
+
+            if (fullName.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (password != confirm) {
+                Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (inputFullName.error != null || inputEmail.error != null || inputPassword.error != null) {
+                Toast.makeText(this, "Please fix input errors.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val request = SignUpRequest(fullName, username, email, password)
+
+            btnCreateAccount.isEnabled = false
+            Toast.makeText(this, "Creating account...", Toast.LENGTH_SHORT).show()
+            Log.d("SignupActivity", "Sending signup request: fullName=$fullName, username=$username, email=$email")
+            ApiClient.apiService.signup(request).enqueue(object : Callback<SignUpResponse> {
+                override fun onResponse(call: Call<SignUpResponse>, response: Response<SignUpResponse>) {
+                    btnCreateAccount.isEnabled = true
+                    val resp = response.body()
+                    Log.d("SignupActivity", "Signup response code=${response.code()} body=$resp")
+                    if (resp?.status == "success") {
+                        Toast.makeText(this@SignupActivity, "Signup successful!", Toast.LENGTH_LONG).show()
+                        startActivity(Intent(this@SignupActivity, LoginActivity::class.java))
+                        finish()
+                    } else {
+                        val msg = resp?.message ?: (response.errorBody()?.string() ?: "Signup failed.")
+                        Log.e("SignupActivity", "Signup failed: $msg")
+                        Toast.makeText(this@SignupActivity, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
+                    btnCreateAccount.isEnabled = true
+                    Log.e("SignupActivity", "Network error", t)
+                    Toast.makeText(this@SignupActivity, "Network error: ${t.localizedMessage}", Toast.LENGTH_LONG).show()
+                }
+            })
+        }
+
+        linkLogin.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()
-        }
-    }
-
-    private fun isStrongPassword(password: String): Boolean {
-        val regex = Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{6,}$")
-        return regex.matches(password)
-    }
-
-    private fun showToast(message: String) {
-        runOnUiThread {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun registerUser(fullName: String, username: String, email: String, password: String) {
-        thread {
-            try {
-                val url = URL("https://606tr6vg-80.inc1.devtunnels.ms/INSULIN/signup.php") // 🟢 Replace with your actual URL
-                val jsonParam = JSONObject().apply {
-                    put("full_name", fullName)
-                    put("username", username)
-                    put("email", email)
-                    put("password", password)
-                }
-
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "POST"
-                connection.setRequestProperty("Content-Type", "application/json; utf-8")
-                connection.setRequestProperty("Accept", "application/json")
-                connection.doOutput = true
-
-                OutputStreamWriter(connection.outputStream).use {
-                    it.write(jsonParam.toString())
-                    it.flush()
-                }
-
-                val response = connection.inputStream.bufferedReader().use { it.readText() }
-                val jsonResponse = JSONObject(response)
-
-                val status = jsonResponse.getString("status")
-                val message = jsonResponse.getString("message")
-
-                showToast(message)
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                showToast("Something went wrong: ${e.localizedMessage}")
-            }
         }
     }
 }

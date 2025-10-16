@@ -1,7 +1,8 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.simats.insulinbuddy.R
 
 class AboutUsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

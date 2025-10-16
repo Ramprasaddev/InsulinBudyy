@@ -1,11 +1,11 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.saveetha.insulinbuddy.utils.SessionManager
+import com.simats.insulinbuddy.SessionManager
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -46,7 +46,7 @@ class InsulinIntakeActivity : AppCompatActivity() {
                 val requestBody = json.toString().toRequestBody(mediaType)
 
                 val request = Request.Builder()
-                    .url("https://606tr6vg-80.inc1.devtunnels.ms/INSULIN/add_insulin_intake.php")
+                    .url("http://14.139.187.229:8081/PDD-2025(9thmonth)/InsulinBuddy/add_insulin_intake.php")
                     .post(requestBody)
                     .build()
 

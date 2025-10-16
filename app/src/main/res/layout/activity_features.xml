@@ -177,7 +177,7 @@
             android:id="@+id/btn_get_started"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Get Started Now"
+            android:text="Get Start Now"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:background="@drawable/button_bg"

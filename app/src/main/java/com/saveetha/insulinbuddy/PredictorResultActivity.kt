@@ -1,9 +1,9 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import org.json.JSONArray
 import org.json.JSONObject
 
 class PredictorResultActivity : AppCompatActivity() {
@@ -11,11 +11,10 @@ class PredictorResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_predictor_result)
 
-        val formulaDoseText = findViewById<TextView>(R.id.formulaDoseText)
         val aiDoseText = findViewById<TextView>(R.id.aiDoseText)
-        val enteredText = findViewById<TextView>(R.id.enteredText)
         val detailsText = findViewById<TextView>(R.id.detailsText)
-        val homeButton = findViewById<ImageButton>(R.id.homeButton)
+        val enteredText = findViewById<TextView>(R.id.enteredText)
+        val warningsLayout = findViewById<LinearLayout>(R.id.warningsLayout)
 
         val resultJsonString = intent.getStringExtra("result")
         val currentGlucose = intent.getIntExtra("current_glucose", 0)
@@ -25,31 +24,35 @@ class PredictorResultActivity : AppCompatActivity() {
 
         if (resultJsonString != null) {
             val resultJson = JSONObject(resultJsonString)
+
+            val aiDose = resultJson.optDouble("ai_dose", 0.0)
             val correction = resultJson.optDouble("correction", 0.0)
             val carbsDose = resultJson.optDouble("carbs_dose", 0.0)
-            val aiDose = resultJson.optDouble("ai_dose", 0.0)
-            val status = resultJson.optString("status", "healthy")
+            val message = resultJson.optString("message", "")
 
-            val formattedCorrection = String.format("%.2f", correction)
-            val formattedCarbsDose = String.format("%.2f", carbsDose)
-            val formattedAiDose = String.format("%.2f", aiDose)
+            aiDoseText.text = "Predicted Dosage: ${String.format("%.2f", aiDose)} units"
+            detailsText.text = "Correction: ${String.format("%.2f", correction)} | Carbs Dose: ${String.format("%.2f", carbsDose)}"
+            enteredText.text = "Entered: Glucose — $currentGlucose mg/dL • Carbs — $carbs g • Activity — $activity • Meal: $timeOfDay"
 
-            formulaDoseText.text = "Correction: $formattedCorrection • Carbs: $formattedCarbsDose"
-            aiDoseText.text = "AI suggested dose: $formattedAiDose units\nStatus: $status"
+            if (message.isNotBlank()) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            }
+
+            warningsLayout.removeAllViews()
+            val warningsArray: JSONArray = resultJson.optJSONArray("warnings") ?: JSONArray()
+            for (i in 0 until warningsArray.length()) {
+                val warning = warningsArray.getString(i)
+                val warningTextView = TextView(this).apply {
+                    text = "• $warning"
+                    setTextColor(resources.getColor(android.R.color.holo_red_dark))
+                    textSize = 14f
+                }
+                warningsLayout.addView(warningTextView)
+            }
         } else {
-            formulaDoseText.text = "Calculation not available"
-            aiDoseText.text = "AI suggestion not available"
-        }
-
-        enteredText.text = "Entered: Glucose — $currentGlucose mg/dL • Carbs — $carbs g"
-        detailsText.text = "Activity: $activity | Meal: $timeOfDay"
-
-        // 🔹 Navigate to HomeActivity when Home button is clicked
-        homeButton.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-            finish()
+            aiDoseText.text = "Predicted Dosage: N/A"
+            detailsText.text = "Details not available"
+            enteredText.text = "User input not available"
         }
     }
 }

@@ -13,14 +13,14 @@
 
                 <TextView
                     android:id="@+id/signupHeading"
-                    android:layout_width="212dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginBottom="50dp"
-
-                    android:text="Sign Up"
-                    android:textColor="#000000"
+                    android:text="Signup"
+                    android:textColor="@color/black"
                     android:textSize="50sp"
+                    android:fontFamily="sans-serif-condensed-medium"
                     android:textStyle="bold" />
 
                 <EditText
@@ -28,18 +28,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Full Name"
-                    android:padding="10dp"
-                    android:background="@android:drawable/edit_text"
-                    android:layout_marginBottom="12dp"/>
+                    android:inputType="textPersonName"
+                    android:padding="16dp"
+                    android:background="@drawable/custom_input_box"
+                    android:layout_marginBottom="12dp"
+                    android:minHeight="48dp" />
+
                 <EditText
                     android:id="@+id/usernameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Username"
-                    android:padding="10dp"
-                    android:background="@android:drawable/edit_text"
-                    android:layout_marginBottom="12dp"/>
-
+                    android:inputType="text"
+                    android:padding="16dp"
+                    android:background="@drawable/custom_input_box"
+                    android:layout_marginBottom="12dp"
+                    android:minHeight="48dp" />
 
                 <EditText
                     android:id="@+id/emailEditText"
@@ -47,29 +51,70 @@
                     android:layout_height="wrap_content"
                     android:hint="Email"
                     android:inputType="textEmailAddress"
-                    android:padding="10dp"
-                    android:background="@android:drawable/edit_text"
-                    android:layout_marginBottom="12dp"/>
+                    android:padding="16dp"
+                    android:background="@drawable/custom_input_box"
+                    android:layout_marginBottom="12dp"
+                    android:minHeight="48dp" />
 
-                <EditText
-                    android:id="@+id/passwordEditText"
+                <LinearLayout
+                    android:id="@+id/passwordLayoutContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Password"
-                    android:inputType="textPassword"
-                    android:padding="10dp"
-                    android:background="@android:drawable/edit_text"
-                    android:layout_marginBottom="12dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:background="@drawable/custom_input_box"
+                    android:layout_marginBottom="12dp">
 
-                <EditText
-                    android:id="@+id/reenterPasswordEditText"
+                        <EditText
+                            android:id="@+id/passwordEditText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Password"
+                            android:inputType="textPassword"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:background="@android:color/transparent"
+                            android:minHeight="48dp" />
+
+                        <ImageView
+                            android:id="@+id/togglePassword"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:contentDescription="Toggle password visibility"
+                            android:src="@drawable/ic_eye_off"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/reenterPasswordLayoutContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Re-enter Password"
-                    android:inputType="textPassword"
-                    android:padding="10dp"
-                    android:background="@android:drawable/edit_text"
-                    android:layout_marginBottom="20dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:background="@drawable/custom_input_box"
+                    android:layout_marginBottom="20dp">
+
+                        <EditText
+                            android:id="@+id/reenterPasswordEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Re-enter Password"
+                            android:inputType="textPassword"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:background="@android:color/transparent"
+                            android:minHeight="48dp" />
+
+                </LinearLayout>
+
 
                 <Button
                     android:id="@+id/submitButton"
@@ -79,6 +124,7 @@
                     android:backgroundTint="#0288D1"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold"
+                    android:padding="12dp"
                     android:layout_marginBottom="16dp"/>
 
                 <Button
@@ -86,9 +132,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Back to Login"
-                    android:backgroundTint="#BBDEFB"
-                    android:textColor="#000000"
-                    android:layout_marginTop="10dp">
-        </Button>
+                    android:backgroundTint="#0288D1"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:padding="12dp"
+                    android:layout_marginTop="10dp"/>
+
         </LinearLayout>
 </ScrollView>

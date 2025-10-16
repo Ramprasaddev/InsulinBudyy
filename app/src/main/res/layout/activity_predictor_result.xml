@@ -2,131 +2,63 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#DBEEF9">
+    android:padding="16dp"
+    android:background="#F3F8FF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
         android:orientation="vertical">
 
-        <!-- Header -->
+        <!-- Predicted AI Dose -->
         <TextView
-            android:id="@+id/header"
+            android:id="@+id/aiDoseText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Predicted Insulin Intake"
-            android:textSize="26sp"
+            android:text="Predicted Dosage: --"
+            android:textColor="#0D47A1"
+            android:textSize="40sp"
             android:textStyle="bold"
-            android:gravity="center"
-            android:textColor="#0C3C82"
-            android:paddingBottom="20dp" />
-
-        <!-- Formula Breakdown -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_box"
-            android:padding="20dp"
-            android:layout_margin="10dp"
-            android:elevation="6dp"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
-
-            <TextView
-                android:id="@+id/formulaDoseText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Correction: 0.0 • Carbs: 0.0"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:textColor="#2C3E50" />
-        </LinearLayout>
-
-        <!-- AI Predicted Dose Highlighted -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="24dp"
-            android:layout_margin="10dp"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:background="@drawable/rounded_box_highlight"
-            android:elevation="10dp">
-
-            <TextView
-                android:id="@+id/aiDoseText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0.0"
-                android:textStyle="bold"
-                android:textSize="40sp"
-                android:textColor="@android:color/holo_blue_dark"
-                android:padding="16dp"
-                android:background="@drawable/circle_highlight"
-                android:gravity="center" />
-
-            <TextView
-                android:id="@+id/aiDoseLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="AI Suggested Units"
-                android:textSize="16sp"
-                android:textColor="#0C3C82"
-                android:paddingTop="12dp" />
-
-            <TextView
-                android:id="@+id/statusText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Status: healthy"
-                android:textSize="14sp"
-                android:textColor="#27AE60"
-                android:paddingTop="6dp" />
-        </LinearLayout>
-
-        <!-- Entered Data -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_box"
-            android:padding="18dp"
-            android:layout_margin="10dp"
-            android:elevation="4dp"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
-
-            <TextView
-                android:id="@+id/enteredText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Entered: Glucose — mg/dL • Carbs — g"
-                android:textSize="16sp"
-                android:textColor="#34495E"
-                android:paddingBottom="6dp" />
-
-            <TextView
-                android:id="@+id/detailsText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Activity: — | Meal: —"
-                android:textColor="#5D6D7E"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <!-- Home Button -->
-        <ImageButton
-            android:id="@+id/homeButton"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/home_icon"
-            android:scaleType="centerInside"
-            app:tint="@android:color/black"
-            android:background="@drawable/rounded_button"
             android:padding="12dp"
-            android:layout_marginTop="28dp"
-            android:layout_gravity="center_horizontal"
-            android:contentDescription="Home" />
+            android:background="#D9E8FF"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Correction, Meal, Activity, Stress -->
+        <TextView
+            android:id="@+id/detailsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Details"
+            android:textColor="#1976D2"
+            android:textSize="32sp"
+            android:padding="12dp"
+            android:background="#E3F2FD"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Entered values -->
+        <TextView
+            android:id="@+id/enteredText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Entered values"
+            android:textColor="#0D47A1"
+            android:textSize="32sp"
+            android:padding="12dp"
+            android:background="#E3F2FD"
+            android:layout_marginBottom="12dp"/>
+
+       
+
+
+        <LinearLayout
+            android:id="@+id/warningsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp"/>
+
+        <!-- Home button -->
+
+
     </LinearLayout>
 </ScrollView>

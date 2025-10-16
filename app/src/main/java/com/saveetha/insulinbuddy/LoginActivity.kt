@@ -1,114 +1,172 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.text.Editable
+import android.text.InputType
+import android.text.TextWatcher
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.saveetha.insulinbuddy.utils.SessionManager
-import okhttp3.*
+import com.simats.insulinbuddy.R
+import com.simats.insulinbuddy.ApiClient
+import com.simats.insulinbuddy.LoginRequest
+import com.simats.insulinbuddy.LoginResponse
+import com.simats.insulinbuddy.HomeActivity
+import com.simats.insulinbuddy.SignupActivity
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import okhttp3.MediaType.Companion.toMediaType
-import org.json.JSONObject
-import java.io.IOException
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class LoginActivity : AppCompatActivity() {
-    private val client = OkHttpClient()
+    private var passwordVisible = false
     private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
+        
         sessionManager = SessionManager(this)
 
-        val usernameEditText = findViewById<EditText>(R.id.usernameEditText)
-        val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
-        val loginButton = findViewById<Button>(R.id.loginButton)
-        val signupLink = findViewById<TextView>(R.id.signupLink)
+        val inputUsername = findViewById<EditText>(R.id.usernameEditText)
+        val inputPassword = findViewById<EditText>(R.id.passwordEditText)
+        val togglePassword = findViewById<ImageView>(R.id.togglePassword)
+        val btnLogin = findViewById<Button>(R.id.loginButton)
+        val signUpLink = findViewById<TextView>(R.id.signupLink)
 
-        val savedUsername = sessionManager.getUsername()
-        if (!savedUsername.isNullOrEmpty()) {
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
-        }
-
-        loginButton.setOnClickListener {
-            val username = usernameEditText.text.toString().trim()
-            val password = passwordEditText.text.toString().trim()
-
-            if (username == "admin" && password == "admin") {
-                sessionManager.saveUsername("admin")
-                Toast.makeText(this, "Logged in as Admin (Bypass)", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, HomeActivity::class.java))
-                return@setOnClickListener
-            }
-
-            if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Username and password cannot be empty", Toast.LENGTH_SHORT).show()
-            } else if (!username.matches(Regex("^[a-zA-Z]+$"))) {
-                Toast.makeText(this, "Username must contain only alphabets", Toast.LENGTH_SHORT).show()
-            } else {
-                loginUser(username, password)
-            }
-        }
-
-        signupLink.setOnClickListener {
-            startActivity(Intent(this, SignupActivity::class.java))
-        }
-    }
-
-    private fun loginUser(username: String, password: String) {
-        val json = JSONObject().apply {
-            put("username", username)
-            put("password", password)
-        }
-
-        val requestBody = RequestBody.create(
-            "application/json; charset=utf-8".toMediaType(),
-            json.toString()
-        )
-
-        val request = Request.Builder()
-            .url("https://606tr6vg-80.inc1.devtunnels.ms/INSULIN/login.php")
-            .post(requestBody)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(this@LoginActivity, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+        // Username validation (non-empty, min length 3, no spaces) – live like signup
+        inputUsername.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val u = s?.toString()?.trim() ?: ""
+                inputUsername.error = when {
+                    u.isEmpty() -> null // handled on submit
+                    u.contains(" ") -> "No spaces allowed"
+                    u.length < 3 -> "Min 3 characters"
+                    else -> null
                 }
             }
 
-            override fun onResponse(call: Call, response: Response) {
-                val resStr = response.body?.string()
-                runOnUiThread {
-                    try {
-                        val jsonResponse = JSONObject(resStr ?: "{}")
-                        when (jsonResponse.getString("status")) {
-                            "success" -> {
-                                val isProfileComplete = jsonResponse.optBoolean("is_profile_complete", false)
-                                sessionManager.saveUsername(username)
-                                val nextIntent = if (isProfileComplete) {
-                                    Intent(this@LoginActivity, HomeActivity::class.java)
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        // Password validation – align with signup (min 6, no spaces)
+        inputPassword.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val password = s.toString()
+                inputPassword.error = when {
+                    password.contains(" ") -> "No spaces allowed"
+                    password.isNotEmpty() && password.length < 6 -> "Min 6 characters"
+                    else -> null
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        // Toggle password visibility
+        togglePassword.setOnClickListener {
+            passwordVisible = !passwordVisible
+            inputPassword.inputType =
+                if (passwordVisible)
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                else
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+
+            togglePassword.setImageResource(
+                if (passwordVisible) R.drawable.ic_eye_off else R.drawable.ic_eye
+            )
+            inputPassword.setSelection(inputPassword.text?.length ?: 0)
+        }
+
+        // Navigate to Signup
+        signUpLink.setOnClickListener {
+            startActivity(Intent(this, SignupActivity::class.java))
+        }
+
+        // Login logic
+        btnLogin.setOnClickListener {
+            val username = inputUsername.text.toString().trim()
+            val password = inputPassword.text.toString().trim()
+
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (inputUsername.error != null || inputPassword.error != null) {
+                Toast.makeText(this, "Please fix input errors", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val loginRequest = LoginRequest(username, password)
+            ApiClient.apiService.login(loginRequest).enqueue(object : Callback<LoginResponse> {
+                override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                    val resp = response.body()
+                    if (resp?.status == "success") {
+                        // Save username to session for future automatic login
+                        sessionManager.saveUsername(username)
+                        Toast.makeText(this@LoginActivity, "Login successful!", Toast.LENGTH_SHORT).show()
+                        // If we've already marked profile completed locally, skip network for faster UX
+                        if (sessionManager.isProfileCompleted()) {
+                            startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                            finish()
+                        } else {
+                            // After login, check if profile is completed
+                            checkProfileCompleted(username) { completed ->
+                                if (completed) {
+                                    sessionManager.setProfileCompleted(true)
+                                    startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
                                 } else {
-                                    Intent(this@LoginActivity, ProfileSetupActivity::class.java)
+                                    startActivity(Intent(this@LoginActivity, ProfileSetupActivity::class.java))
                                 }
-                                Log.d("Login", "Navigating to: ${nextIntent.component?.className}")
-                                startActivity(nextIntent)
                                 finish()
                             }
-                            "fail", "error" -> {
-                                Toast.makeText(this@LoginActivity, jsonResponse.getString("message"), Toast.LENGTH_SHORT).show()
-                            }
-                            else -> {
-                                Toast.makeText(this@LoginActivity, "Unexpected response", Toast.LENGTH_SHORT).show()
-                            }
                         }
-                    } catch (e: Exception) {
-                        Toast.makeText(this@LoginActivity, "Invalid response: ${e.message}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@LoginActivity, resp?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
                     }
-                    Log.d("LoginResponse", "Raw response: $resStr")
+                }
+
+                override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                    Toast.makeText(this@LoginActivity, "Network error: ${t.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+    }
+
+    private fun checkProfileCompleted(username: String, callback: (Boolean) -> Unit) {
+        val client = okhttp3.OkHttpClient()
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = org.json.JSONObject().apply { put("username", username) }.toString().toRequestBody(mediaType)
+        val request = okhttp3.Request.Builder()
+            .url("http://14.139.187.229:8081/PDD-2025(9thmonth)/InsulinBuddy/get_user_profile.php")
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+                runOnUiThread { callback(false) }
+            }
+
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                try {
+                    if (!response.isSuccessful) {
+                        runOnUiThread { callback(false) }
+                        return
+                    }
+                    val str = response.body?.string()?.trim().orEmpty()
+                    if (str.isEmpty() || !(str.startsWith("{") && str.endsWith("}"))) {
+                        runOnUiThread { callback(false) }
+                        return
+                    }
+                    val json = org.json.JSONObject(str)
+                    val completed = json.optInt("profile_completed", 0) == 1
+                    runOnUiThread { callback(completed) }
+                } catch (_: Exception) {
+                    runOnUiThread { callback(false) }
                 }
             }
         })

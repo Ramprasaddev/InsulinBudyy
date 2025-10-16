@@ -1,4 +1,4 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import android.content.Intent
 import android.os.Bundle

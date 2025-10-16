@@ -2,36 +2,62 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/notificationsRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F3F8FF"
+    tools:context=".NotificationsActivity">
 
-    <Button
-        android:id="@+id/buttonClearAll"
-        android:layout_width="wrap_content"
+    <!-- Top Action Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Clear All"
-        android:layout_margin="16dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="12dp"
+        android:background="#1976D2"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <Button
-        android:id="@+id/buttonInsertFakeData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Insert Fake Data"
-        android:layout_margin="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <Button
+            android:id="@+id/buttonClearAll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Clear All"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#1565C0"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:layout_marginEnd="6dp"/>
 
+        <Button
+            android:id="@+id/buttonRefreshAI"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Refresh AI Notifications"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#0D47A1"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:layout_marginStart="6dp"/>
+    </LinearLayout>
+
+    <!-- Notifications List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notificationsRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
         android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/buttonClearAll"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@+id/topBar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/notification_item"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

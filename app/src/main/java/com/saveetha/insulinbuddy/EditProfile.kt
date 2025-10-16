@@ -1,4 +1,4 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import android.os.Bundle
 import android.widget.*
@@ -6,7 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.saveetha.insulinbuddy.utils.SessionManager
+import com.simats.insulinbuddy.SessionManager
+import com.simats.insulinbuddy.R
 
 class EditProfile : AppCompatActivity() {
 
@@ -64,7 +65,7 @@ class EditProfile : AppCompatActivity() {
         username: String, contact: String, age: String,
         isf: String, icr: String, target: String, weight: String
     ) {
-        val url = "https://606tr6vg-80.inc1.devtunnels.ms/INSULIN/edit_profile.php"
+        val url = "http://14.139.187.229:8081/PDD-2025(9thmonth)/InsulinBuddy/edit_profile.php"
         val requestQueue = Volley.newRequestQueue(this)
 
         val stringRequest = object : StringRequest(

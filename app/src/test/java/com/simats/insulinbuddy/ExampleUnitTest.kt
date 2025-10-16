@@ -1,4 +1,4 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import org.junit.Test
 

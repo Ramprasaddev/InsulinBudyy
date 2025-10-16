@@ -1,4 +1,4 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import android.content.Intent
 import android.net.Uri
@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.saveetha.insulinbuddy.R
+import com.simats.insulinbuddy.R
 
 class UserSupportActivity : AppCompatActivity() {
 

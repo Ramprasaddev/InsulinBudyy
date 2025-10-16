@@ -1,189 +1,250 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.saveetha.insulinbuddy.utils.SessionManager
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
+import java.net.SocketTimeoutException
+import java.util.concurrent.TimeUnit
 
 class PredictorActivity : AppCompatActivity() {
 
-    private val client = OkHttpClient()
+    private val client: OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .callTimeout(120, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .build()
     private lateinit var sessionManager: SessionManager
+
+    private var icr: Double? = null
+    private var isr: Double? = null
+    private var targetGlucose: Double? = null
+    private var age: Int? = null
+    private var gender: String? = null
+    private var diabetesType: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_predictor)
 
         sessionManager = SessionManager(this)
+        val username = sessionManager.getUsername() ?: ""
 
-        val username: String = sessionManager.getUsername() ?: ""
+        if (username.isNotEmpty()) {
+            fetchUserProfile(username)
+        }
+
         val glucoseEditText = findViewById<EditText>(R.id.glucoseEditText)
         val carbsEditText = findViewById<EditText>(R.id.carbsEditText)
-        val activitySpinner = findViewById<Spinner>(R.id.activitySpinner)
-        val mealTypeSpinner = findViewById<Spinner>(R.id.mealTypeSpinner)
+        val activityEditText = findViewById<EditText>(R.id.activityEditText)
+        val stressSpinner = findViewById<Spinner>(R.id.stressSpinner)
+        val mealSpinner = findViewById<Spinner>(R.id.mealTypeSpinner)
+        val notesEditText = findViewById<EditText>(R.id.notesEditText)
         val submitBtn = findViewById<Button>(R.id.submitBtn)
 
-        // ✅ Use custom spinner item layout for bigger font
-        val activityAdapter = ArrayAdapter(
+        // Dropdown setup
+        stressSpinner.adapter = ArrayAdapter(
             this,
-            R.layout.spinner_item,
+            android.R.layout.simple_spinner_dropdown_item,
             listOf("Low", "Moderate", "High")
         )
-        activityAdapter.setDropDownViewResource(R.layout.spinner_item)
-        activitySpinner.adapter = activityAdapter
 
-        val mealTypeAdapter = ArrayAdapter(
+        mealSpinner.adapter = ArrayAdapter(
             this,
-            R.layout.spinner_item,
-            listOf("Morning", "Afternoon", "Evening", "Night") // 👈 Afternoon visible
+            android.R.layout.simple_spinner_dropdown_item,
+            listOf("Morning", "Lunch", "Evening", "Night")
         )
-        mealTypeAdapter.setDropDownViewResource(R.layout.spinner_item)
-        mealTypeSpinner.adapter = mealTypeAdapter
 
         submitBtn.setOnClickListener {
-            val currentGlucose = glucoseEditText.text.toString().toIntOrNull()
+            val glucose = glucoseEditText.text.toString().toIntOrNull()
             val carbs = carbsEditText.text.toString().toIntOrNull()
-            val activity = activitySpinner.selectedItem.toString()
-            val timeOfDay = mealTypeSpinner.selectedItem.toString()
+            val activity = activityEditText.text.toString().toIntOrNull()
+            val stress = stressSpinner.selectedItem.toString()
+            val mealType = mealSpinner.selectedItem.toString()
+            val notes = notesEditText.text.toString()
 
-            if (currentGlucose == null || carbs == null) {
-                Toast.makeText(this, "Please enter valid glucose and carb values", Toast.LENGTH_SHORT).show()
+            if (glucose == null || carbs == null || activity == null) {
+                Toast.makeText(this, "Enter valid glucose, carbs, and activity", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val phpBaseUrl = "https://606tr6vg-80.inc1.devtunnels.ms/INSULIN"
-            val fastapiBaseUrl = "https://adequate-lovely-mayfly.ngrok-free.app"
-
-            fetchUserProfileAndPredict(username, currentGlucose, carbs, activity, timeOfDay, phpBaseUrl, fastapiBaseUrl)
+            sendPredictionRequest(username, glucose, carbs, activity, stress, mealType, notes)
         }
     }
 
-    private fun fetchUserProfileAndPredict(
+    private fun sendPredictionRequest(
         username: String,
-        currentGlucose: Int,
+        glucose: Int,
         carbs: Int,
-        activity: String,
-        timeOfDay: String,
-        phpBaseUrl: String,
-        fastapiBaseUrl: String
+        activityMinutes: Int,
+        stress: String,
+        mealType: String,
+        notes: String
     ) {
-        val profileUrl = "$phpBaseUrl/fetch_user_profile.php?username=$username"
-        val request = Request.Builder().url(profileUrl).build()
+        val apiUrl = "https://insulin-dose-v7oc.onrender.com/predict"
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(
-                        this@PredictorActivity,
-                        "Profile fetch failed: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+        val activityLevel = when {
+            activityMinutes <= 15 -> "Low"
+            activityMinutes <= 45 -> "Moderate"
+            else -> "High"
+        }
+
+        val timeOfDay = when (mealType) {
+            "Morning" -> "Morning"
+            "Afternoon" -> "Lunch"
+            "Evening" -> "Evening"
+            "Night" -> "Night"
+            else -> "Lunch"
+        }
+
+        val missing = mutableListOf<String>()
+        if (icr == null) missing += "ICR"
+        if (isr == null) missing += "ISR"
+        if (targetGlucose == null) missing += "target_glucose"
+        if (age == null) missing += "age"
+        if (gender == null) missing += "gender"
+        if (diabetesType == null) missing += "type_of_diabetes"
+
+        if (missing.isNotEmpty()) {
+            runOnUiThread {
+                Toast.makeText(
+                    this@PredictorActivity,
+                    "Profile incomplete (${missing.joinToString()}). Trying to refresh...",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
+            fetchUserProfile(username)
+            return
+        }
 
-            override fun onResponse(call: Call, response: Response) {
-                if (!response.isSuccessful) {
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@PredictorActivity,
-                            "Profile fetch failed with status: ${response.code}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    return
-                }
+        val payload = JSONObject().apply {
+            put("ICR", icr!!)
+            put("ISR", isr!!)
+            put("target_glucose", targetGlucose!!)
+            put("current_glucose", glucose.toDouble())
+            put("carbs", carbs.toDouble())
+            put("age", age!!)
+            put("gender", gender!!)
+            put("type_of_diabetes", diabetesType!!)
+            put("activity", activityLevel)
+            put("time_of_day", timeOfDay)
+        }
 
-                val profileJson = JSONObject(response.body?.string() ?: "{}")
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = payload.toString().toRequestBody(mediaType)
+        val request = Request.Builder().url(apiUrl).post(body).build()
 
-                if (profileJson.has("error")) {
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@PredictorActivity,
-                            "Error: ${profileJson.getString("error")}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    return
-                }
-
-                val gender = profileJson.optString("gender", "Male").replaceFirstChar { it.uppercase() }
-                val diabetesType = profileJson.optString("type_of_diabetes", "Type1").replaceFirstChar { it.uppercase() }
-
-                val mappedTimeOfDay = when (timeOfDay.lowercase()) {
-                    "afternoon" -> "Lunch"   // 👈 map Afternoon → Lunch for backend
-                    "morning" -> "Morning"
-                    "evening" -> "Evening"
-                    else -> "Night"
-                }
-
-                val data = JSONObject().apply {
-                    put("gender", if (gender == "Female") "Female" else "Male")
-                    put("age", profileJson.optInt("age", 25))
-                    put("type_of_diabetes", if (diabetesType == "Type2") "Type2" else "Type1")
-                    put("ICR", profileJson.optDouble("ICR", 10.0))
-                    put("ISR", profileJson.optDouble("ISR", 50.0))
-                    put("target_glucose", profileJson.optDouble("target_glucose", 120.0))
-                    put("current_glucose", currentGlucose.toDouble())
-                    put("carbs", carbs.toDouble())
-                    put("activity", when (activity.lowercase()) {
-                        "high" -> "High"
-                        "moderate" -> "Moderate"
-                        else -> "Low"
-                    })
-                    put("time_of_day", mappedTimeOfDay) // 👈 safe value for backend
-                }
-
-                Log.d("PredictData", data.toString())
-                sendPredictRequest(data, fastapiBaseUrl)
-            }
-        })
+        performPredictionCall(request, glucose, carbs, activityLevel, timeOfDay, attempt = 1)
     }
 
-    private fun sendPredictRequest(data: JSONObject, fastapiBaseUrl: String) {
-        val url = "$fastapiBaseUrl/predict"
-        val body = RequestBody.create("application/json".toMediaTypeOrNull(), data.toString())
-        val request = Request.Builder().url(url).post(body).build()
-
+    private fun performPredictionCall(
+        request: Request,
+        glucose: Int,
+        carbs: Int,
+        activityLevel: String,
+        timeOfDay: String,
+        attempt: Int
+    ) {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                val isTimeout = e is SocketTimeoutException
+                if (isTimeout && attempt == 1) {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@PredictorActivity,
+                            "Server is waking up, retrying...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    performPredictionCall(request, glucose, carbs, activityLevel, timeOfDay, attempt = 2)
+                    return
+                }
+
                 runOnUiThread {
-                    Toast.makeText(
-                        this@PredictorActivity,
-                        "Prediction failed: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    val msg = if (isTimeout) {
+                        "Prediction timed out. Please try again in a few seconds."
+                    } else {
+                        "Prediction failed: ${e.message}"
+                    }
+                    Toast.makeText(this@PredictorActivity, msg, Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val responseBody = response.body?.string() ?: "{}"
-                if (!response.isSuccessful) {
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@PredictorActivity,
-                            "Prediction failed: $responseBody",
-                            Toast.LENGTH_LONG
-                        ).show()
+                Log.d("PredictResponse", responseBody)
+                try {
+                    val intent = Intent(this@PredictorActivity, PredictorResultActivity::class.java).apply {
+                        putExtra("result", responseBody)
+                        putExtra("current_glucose", glucose)
+                        putExtra("carbs", carbs)
+                        putExtra("activity", activityLevel)
+                        putExtra("time_of_day", timeOfDay)
                     }
-                    Log.e("PredictError", responseBody)
-                    return
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        Toast.makeText(this@PredictorActivity, "Error parsing prediction", Toast.LENGTH_LONG).show()
+                        Log.e("PredictError", e.toString())
+                    }
                 }
+            }
+        })
+    }
 
-                val resultJson = JSONObject(responseBody)
-                val intent = Intent(this@PredictorActivity, PredictorResultActivity::class.java).apply {
-                    putExtra("result", resultJson.toString())
-                    putExtra("current_glucose", data.getInt("current_glucose"))
-                    putExtra("carbs", data.getInt("carbs"))
-                    putExtra("activity", data.getString("activity"))
-                    putExtra("time_of_day", data.getString("time_of_day"))
+    private fun fetchUserProfile(username: String) {
+        // ✅ Use 10.0.2.2 for Emulator OR replace with your system's IP if testing on real device
+        val url = "http://14.139.187.229:8081/PDD-2025(9thmonth)/InsulinBuddy/get_user_profile.php"
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = JSONObject().apply { put("username", username) }.toString().toRequestBody(mediaType)
+        val request = Request.Builder().url(url).post(body).build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.w("PredictorActivity", "Profile fetch failed: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val resp = response.body?.string() ?: return
+                try {
+                    val json = JSONObject(resp)
+                    if (json.optString("status") == "success") {
+                        gender = json.optString("gender", "").replaceFirstChar { it.uppercase() }
+
+                        val t = json.optString("diabetes_type", "")
+                        diabetesType = when {
+                            t.equals("Type1", ignoreCase = true) -> "Type1"
+                            t.equals("Type2", ignoreCase = true) -> "Type2"
+                            else -> null
+                        }
+
+
+                        age = json.optInt("age", -1).let { if (it >= 0) it else null }
+                        icr = json.optDouble("icr", Double.NaN).let { if (it.isNaN()) null else it }
+                        isr = json.optDouble("isr", Double.NaN).let { if (it.isNaN()) null else it }
+                        targetGlucose = json.optDouble("target_glucose", Double.NaN).let { if (it.isNaN()) null else it }
+
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@PredictorActivity,
+                                "Profile loaded successfully for $username",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        Log.w("PredictorActivity", "Profile not found for $username")
+                    }
+                } catch (e: Exception) {
+                    Log.e("PredictorActivity", "Error parsing profile JSON: ${e.message}")
                 }
-                startActivity(intent)
             }
         })
     }

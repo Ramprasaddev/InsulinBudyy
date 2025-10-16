@@ -1,4 +1,4 @@
-package com.saveetha.insulinbuddy
+package com.simats.insulinbuddy
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -120,7 +120,7 @@ class GlucoseGraphActivity : AppCompatActivity() {
 
     private fun fetchGraphData(startDate: String, endDate: String) {
         val url =
-            "https://606tr6vg-80.inc1.devtunnels.ms/INSULIN/fetch_glucose_data.php" +
+            "http://14.139.187.229:8081/PDD-2025(9thmonth)/InsulinBuddy/fetch_glucose_data.php" +
                     "?username=${username}&start_date=${startDate}&end_date=${endDate}"
 
         val request = Request.Builder().url(url).build()
