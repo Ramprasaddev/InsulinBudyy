@@ -6,6 +6,8 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
+import android.content.ContentValues
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -270,32 +272,101 @@ class InsulinGraphActivity : AppCompatActivity() {
                 val c = Canvas(b)
                 insulinChart.draw(c)
 
+                // create PDF document with larger page to include stats
                 val pdfDocument = PdfDocument()
-                val pageInfo = PdfDocument.PageInfo.Builder(b.width, b.height, 1).create()
+                val pageWidth = b.width + 100
+                val pageHeight = b.height + 200
+                val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
                 val page = pdfDocument.startPage(pageInfo)
                 val canvas = page.canvas
-                canvas.drawBitmap(b, 0f, 0f, null)
 
-                // Add text below the chart
-               val paint = Paint().apply {
-                   color = android.graphics.Color.BLACK
-                   textSize = 12f
-               }
-                canvas.drawText(txtStats.text.toString(), 20f, b.height + 50f, paint)
+                // Draw chart
+                canvas.drawBitmap(b, 50f, 50f, null)
+
+                // Add report header
+                val paint = Paint().apply {
+                    color = android.graphics.Color.BLACK
+                    textSize = 18f
+                    isFakeBoldText = true
+                }
+                canvas.drawText("Insulin Intake Report", 50f, 30f, paint)
+
+                // Add date range info
+                paint.textSize = 12f
+                paint.isFakeBoldText = false
+                val dateRange = "Period: $currentRange (${calculateDateRange(currentRange).first} to ${calculateDateRange(currentRange).second})"
+                canvas.drawText(dateRange, 50f, b.height + 80f, paint)
+
+                // Add statistics
+                val statsText = txtStats.text.toString()
+                val lines = statsText.split("\n")
+                var yOffset = b.height + 100f
+                lines.forEach { line ->
+                    canvas.drawText(line, 50f, yOffset, paint)
+                    yOffset += 20f
+                }
+
+                // Add footer
+                val currentTime = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+                canvas.drawText("Generated on: $currentTime", 50f, pageHeight - 30f, paint)
+                canvas.drawText("InsulinBuddy App", pageWidth - 150f, pageHeight - 30f, paint)
 
                 pdfDocument.finishPage(page)
 
-                val pdfDir = File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "InsulinReports")
-                if (!pdfDir.exists()) pdfDir.mkdirs()
-                val file = File(pdfDir, "insulin_report_${System.currentTimeMillis()}.pdf")
-                val fos = FileOutputStream(file)
-                pdfDocument.writeTo(fos)
-                fos.close()
-                pdfDocument.close()
-
-                Toast.makeText(this, "PDF saved: ${file.absolutePath}", Toast.LENGTH_LONG).show()
+                val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val displayName = "Insulin_Report_${currentRange}_${timestamp}.pdf"
+                val resolver = contentResolver
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, displayName)
+                    put(MediaStore.Downloads.MIME_TYPE, "application/pdf")
+                    put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/InsulinBuddy")
+                }
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    resolver.openOutputStream(uri).use { out ->
+                        if (out != null) {
+                            pdfDocument.writeTo(out)
+                            out.flush()
+                            pdfDocument.close()
+                            Toast.makeText(this, "PDF saved to Downloads/InsulinBuddy", Toast.LENGTH_LONG).show()
+                        } else {
+                            throw Exception("Unable to open output stream")
+                        }
+                    }
+                } else {
+                    throw Exception("Unable to create media store entry")
+                }
             } catch (e: Exception) {
-                Toast.makeText(this, "Error saving PDF: ${e.message}", Toast.LENGTH_SHORT).show()
+                // Fallback to PNG image in Pictures/InsulinBuddy
+                try {
+                    val bFallback = Bitmap.createBitmap(insulinChart.width, insulinChart.height, Bitmap.Config.ARGB_8888)
+                    val cFallback = Canvas(bFallback)
+                    insulinChart.draw(cFallback)
+                    val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                    val displayName = "Insulin_Chart_${currentRange}_${timestamp}.png"
+                    val resolver = contentResolver
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
+                        put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/InsulinBuddy")
+                    }
+                    val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                    if (uri != null) {
+                        resolver.openOutputStream(uri).use { out ->
+                            if (out != null) {
+                                bFallback.compress(Bitmap.CompressFormat.PNG, 100, out)
+                                out.flush()
+                                Toast.makeText(this, "Saved chart image to Pictures/InsulinBuddy", Toast.LENGTH_LONG).show()
+                            } else {
+                                throw Exception("Unable to open output stream for image")
+                            }
+                        }
+                    } else {
+                        throw Exception("Unable to create image media store entry")
+                    }
+                } catch (ie: Exception) {
+                    Toast.makeText(this, "Save failed: ${ie.message}", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

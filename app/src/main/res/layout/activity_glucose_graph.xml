@@ -44,15 +44,6 @@
         android:layout_marginBottom="20sp"
         android:backgroundTint="#1976D2"
         android:textColor="#FFFFFF" />
-    <Button
-        android:id="@+id/btnSharePDF"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Share Report as PDF"
-        android:textSize="16sp"
-        android:padding="12dp"
-        android:layout_marginBottom="20sp"
-        android:backgroundTint="#1976D2"
-        android:textColor="#FFFFFF" />
+
 
 </LinearLayout>

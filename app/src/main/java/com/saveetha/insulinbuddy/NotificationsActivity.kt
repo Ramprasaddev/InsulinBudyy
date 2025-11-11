@@ -1,19 +1,26 @@
 package com.simats.insulinbuddy
 
-import android.app.*
-import android.content.*
-import android.os.*
-import android.widget.*
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.*
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import kotlin.random.Random
 
 
@@ -28,8 +35,6 @@ class NotificationsActivity : AppCompatActivity() {
     private lateinit var clearAllButton: Button
     private lateinit var adapter: NotificationAdapter
     private val notificationsList: MutableList<NotificationModel> = mutableListOf()
-    private val client = OkHttpClient()
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,107 +42,33 @@ class NotificationsActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.notificationsRecyclerView)
         clearAllButton = findViewById(R.id.buttonClearAll)
-        adapter = NotificationAdapter(notificationsList)
+        findViewById<TextView?>(R.id.notificationsSubtitle)?.text = "Daily reminders appear here."
+
+        adapter = NotificationAdapter(notificationsList) { position ->
+            // remove single
+            notificationsList.removeAt(position)
+            adapter.notifyItemRemoved(position)
+            saveNotifications(this, notificationsList)
+        }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
         clearAllButton.setOnClickListener {
             notificationsList.clear()
             adapter.notifyDataSetChanged()
+            saveNotifications(this, notificationsList)
         }
 
-        // Load notifications initially
-        loadAIgeneratedNotifications()
-
-        // Schedule 4 daily reminders (every 6 hours)
-        scheduleDailyReminders()
-    }
-
-    private fun loadAIgeneratedNotifications() {
-        coroutineScope.launch {
-            try {
-                val aiPrompts = listOf(
-                    "Generate short motivational diabetes care reminders about insulin, glucose, carbs, and health monitoring",
-                    "Create simple daily diabetes management tips",
-                    "Write reminders for healthy lifestyle and glucose tracking in short sentences"
-                )
-
-                val combinedPrompt = aiPrompts.joinToString(". ")
-
-                val requestBody = """
-                    {"inputs": "$combinedPrompt. Generate 24 short reminders."}
-                """.trimIndent()
-
-                val request = Request.Builder()
-                    .url("https://api-inference.huggingface.co/models/gpt2")
-                    .post(RequestBody.create("application/json".toMediaTypeOrNull(), requestBody))
-                    .build()
-
-                val response = client.newCall(request).execute()
-                val body = response.body?.string() ?: ""
-
-                val messages = extractAItexts(body)
-                val now = System.currentTimeMillis()
-
-                withContext(Dispatchers.Main) {
-                    messages.forEach {
-                        notificationsList.add(
-                            NotificationModel(
-                                title = "🤖 AI Health Reminder",
-                                message = it,
-                                timestamp = now
-                            )
-                        )
-                    }
-                    adapter.notifyDataSetChanged()
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun extractAItexts(response: String): List<String> {
-        // Simplify the generated text into short readable lines
-        return response
-            .split(".")
-            .map { it.trim() }
-            .filter { it.isNotEmpty() && it.length in 10..100 }
-            .take(24)
-    }
-
-    private fun scheduleDailyReminders() {
-        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val times = listOf(6, 12, 18, 24) // every 6 hours
-
-        for (i in times.indices) {
-            val intent = Intent(this, NotificationReceiver::class.java)
-            intent.putExtra("reminder_id", i)
-            val pendingIntent = PendingIntent.getBroadcast(
-                this,
-                i,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-
-            val triggerTime = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, times[i])
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-            }.timeInMillis
-
-            alarmManager.setRepeating(
-                AlarmManager.RTC_WAKEUP,
-                triggerTime,
-                AlarmManager.INTERVAL_DAY,
-                pendingIntent
-            )
-        }
+        // Load stored notifications
+        notificationsList.addAll(loadNotifications(this))
+        adapter.notifyDataSetChanged()
     }
 }
 
-class NotificationAdapter(private val notifications: MutableList<NotificationModel>) :
-    RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {
+class NotificationAdapter(
+    private val notifications: MutableList<NotificationModel>,
+    private val onDelete: (Int) -> Unit
+) : RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {
 
     class NotificationViewHolder(itemView: android.view.View) : RecyclerView.ViewHolder(itemView) {
         val title: android.widget.TextView = itemView.findViewById(R.id.notificationTitle)
@@ -157,6 +88,8 @@ class NotificationAdapter(private val notifications: MutableList<NotificationMod
         holder.message.text = n.message
         holder.timestamp.text = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
             .format(Date(n.timestamp))
+        val deleteBtn = holder.itemView.findViewById<android.widget.ImageButton?>(R.id.buttonDelete)
+        deleteBtn?.setOnClickListener { onDelete(holder.adapterPosition) }
     }
 
     override fun getItemCount() = notifications.size
@@ -178,21 +111,165 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         val reminderMessages = listOf(
-            "💉 Please update your insulin dosage in the InsulinBuddy app.",
-            "📈 Record your current glucose level for AI tracking.",
-            "🍽️ Log your carb intake for better insulin prediction.",
-            "🩺 Time for your daily health check and sync!"
+            "Time to record your glucose and insulin. Keep your log up to date.",
+            "Daily check-in: update glucose and insulin, view your graphs.",
+            "Don't forget to enter today's glucose and insulin, then review reports.",
+            "Quick reminder: log glucose/insulin now and check your trends."
         )
 
-        val randomMessage = reminderMessages.random()
+        val message = reminderMessages.random()
+
+        // Persist to local storage
+        addNotification(context, NotificationModel(
+            title = "InsulinBuddy Reminder",
+            message = message,
+            timestamp = System.currentTimeMillis()
+        ))
+
+        // Tap opens notifications screen
+        val tapIntent = Intent(context, NotificationsActivity::class.java)
+        val tapPending = PendingIntent.getActivity(
+            context,
+            1001,
+            tapIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.app_icon)
             .setContentTitle("InsulinBuddy Reminder")
-            .setContentText(randomMessage)
+            .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+            .setContentIntent(tapPending)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 
         notificationManager.notify(Random.nextInt(), builder.build())
+    }
+}
+
+// Storage helpers
+private const val PREFS_NAME = "notifications_store"
+private const val PREFS_KEY = "items"
+
+fun loadNotifications(context: Context): List<NotificationModel> {
+    val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    val json = sp.getString(PREFS_KEY, "[]") ?: "[]"
+    val arr = JSONArray(json)
+    val list = mutableListOf<NotificationModel>()
+    for (i in 0 until arr.length()) {
+        val o = arr.getJSONObject(i)
+        list += NotificationModel(
+            title = o.optString("title"),
+            message = o.optString("message"),
+            timestamp = o.optLong("timestamp")
+        )
+    }
+    return list
+}
+
+fun saveNotifications(context: Context, items: List<NotificationModel>) {
+    val arr = JSONArray()
+    items.forEach {
+        val o = JSONObject()
+        o.put("title", it.title)
+        o.put("message", it.message)
+        o.put("timestamp", it.timestamp)
+        arr.put(o)
+    }
+    context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        .edit()
+        .putString(PREFS_KEY, arr.toString())
+        .apply()
+}
+
+fun addNotification(context: Context, item: NotificationModel) {
+    val existing = loadNotifications(context).toMutableList()
+    existing.add(0, item)
+    saveNotifications(context, existing)
+}
+
+fun scheduleDailyReminder6am(context: Context) {
+    // Backwards-compat: now schedules 4 daily times and reconciles missed ones
+    scheduleDailyReminderMultiple(context, listOf(9 to 0, 13 to 0, 19 to 0, 22 to 0))
+}
+
+fun scheduleDailyReminderMultiple(context: Context, times: List<Pair<Int, Int>>) {
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    times.forEachIndexed { index, (hour, minute) ->
+        val intent = Intent(context, NotificationReceiver::class.java)
+        intent.putExtra("slot_hour", hour)
+        intent.putExtra("slot_min", minute)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            700 + index,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val cal = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            if (timeInMillis <= System.currentTimeMillis()) {
+                add(Calendar.DAY_OF_YEAR, 1)
+            }
+        }
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            cal.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
+            pendingIntent
+        )
+    }
+}
+
+private fun todayKey(): String {
+    val sdf = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+    return sdf.format(Date())
+}
+
+private const val PREFS_DELIVERED = "notifications_delivered"
+
+private fun markDelivered(context: Context, hour: Int) {
+    val sp = context.getSharedPreferences(PREFS_DELIVERED, Context.MODE_PRIVATE)
+    val key = todayKey()
+    val set = sp.getStringSet(key, mutableSetOf())?.toMutableSet() ?: mutableSetOf()
+    set.add(hour.toString())
+    sp.edit().putStringSet(key, set).apply()
+}
+
+private fun isDelivered(context: Context, hour: Int): Boolean {
+    val sp = context.getSharedPreferences(PREFS_DELIVERED, Context.MODE_PRIVATE)
+    val key = todayKey()
+    val set = sp.getStringSet(key, emptySet()) ?: emptySet()
+    return set.contains(hour.toString())
+}
+
+fun reconcileMissedNotificationsForToday(context: Context) {
+    val now = Calendar.getInstance()
+    val planned = listOf(9 to 0, 13 to 0, 19 to 0, 22 to 0)
+    planned.forEach { (hour, minute) ->
+        val slotTime = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        if (slotTime.before(now) && !isDelivered(context, hour)) {
+            // Add to in-app list so user sees all four at night
+            addNotification(context, NotificationModel(
+                title = "InsulinBuddy Reminder",
+                message = when (hour) {
+                    9 -> "Morning: record glucose and insulin, then review your report."
+                    13 -> "Afternoon: log lunch glucose/carbs and insulin."
+                    19 -> "Evening: update glucose/insulin and check your graphs."
+                    else -> "Night: final check — record today's glucose/insulin and review."
+                },
+                timestamp = slotTime.timeInMillis
+            ))
+            markDelivered(context, hour)
+        }
     }
 }

@@ -4,12 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
+import com.simats.insulinbuddy.SubscriptionActivity
 import com.simats.insulinbuddy.R
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+
+        // Ensure 4 daily reminders are scheduled and missed ones are reconciled
+        scheduleDailyReminder6am(this)
+        reconcileMissedNotificationsForToday(this)
 
         Handler().postDelayed({
             val sessionManager = SessionManager(this)
@@ -23,8 +28,10 @@ class SplashActivity : AppCompatActivity() {
                     startActivity(Intent(this, ProfileSetupActivity::class.java))
                 }
             } else {
-                // No session yet → first-time flow
-                startActivity(Intent(this, WelcomeActivity::class.java))
+                // No session yet → first-time flow goes to Subscription first, then Welcome
+                val intent = Intent(this, SubscriptionActivity::class.java)
+                intent.putExtra("launched_from", "splash")
+                startActivity(intent)
             }
             finish()
         }, 2000)

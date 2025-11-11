@@ -4,6 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import android.text.InputFilter
+import android.text.TextWatcher
+import android.text.Editable
+import android.text.method.DigitsKeyListener
 import androidx.appcompat.app.AppCompatActivity
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -64,20 +68,93 @@ class PredictorActivity : AppCompatActivity() {
         )
 
         submitBtn.setOnClickListener {
-            val glucose = glucoseEditText.text.toString().toIntOrNull()
-            val carbs = carbsEditText.text.toString().toIntOrNull()
-            val activity = activityEditText.text.toString().toIntOrNull()
+            val glucoseStr = glucoseEditText.text.toString().trim()
+            val carbsStr = carbsEditText.text.toString().trim()
+            val activityStr = activityEditText.text.toString().trim()
             val stress = stressSpinner.selectedItem.toString()
             val mealType = mealSpinner.selectedItem.toString()
             val notes = notesEditText.text.toString()
 
-            if (glucose == null || carbs == null || activity == null) {
-                Toast.makeText(this, "Enter valid glucose, carbs, and activity", Toast.LENGTH_SHORT).show()
+            // Empty checks
+            if (glucoseStr.isEmpty() || carbsStr.isEmpty() || activityStr.isEmpty()) {
+                Toast.makeText(this, "Enter glucose, carbs, and activity", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Ranged validations
+            val glucose = glucoseStr.toIntOrNull()
+            if (glucose == null || glucose < 40 || glucose > 600) {
+                glucoseEditText.error = "Glucose must be 40-600"
+                glucoseEditText.requestFocus()
+                return@setOnClickListener
+            }
+
+            val carbs = carbsStr.toIntOrNull()
+            if (carbs == null || carbs < 0 || carbs > 500) {
+                carbsEditText.error = "Carbs must be 0-500 g"
+                carbsEditText.requestFocus()
+                return@setOnClickListener
+            }
+
+            val activity = activityStr.toIntOrNull()
+            if (activity == null || activity < 0 || activity > 600) {
+                activityEditText.error = "Activity minutes must be 0-600"
+                activityEditText.requestFocus()
                 return@setOnClickListener
             }
 
             sendPredictionRequest(username, glucose, carbs, activity, stress, mealType, notes)
         }
+
+        // Live input restrictions and validation hints
+        glucoseEditText.keyListener = DigitsKeyListener.getInstance("0123456789")
+        glucoseEditText.filters = arrayOf(InputFilter.LengthFilter(3))
+        carbsEditText.keyListener = DigitsKeyListener.getInstance("0123456789")
+        carbsEditText.filters = arrayOf(InputFilter.LengthFilter(3))
+        activityEditText.keyListener = DigitsKeyListener.getInstance("0123456789")
+        activityEditText.filters = arrayOf(InputFilter.LengthFilter(3))
+
+        glucoseEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val v = s?.toString()?.toIntOrNull()
+                glucoseEditText.error = when {
+                    s.isNullOrEmpty() -> null
+                    v == null -> "Enter valid glucose"
+                    v < 40 || v > 600 -> "Glucose must be 40-600"
+                    else -> null
+                }
+            }
+        })
+
+        carbsEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val v = s?.toString()?.toIntOrNull()
+                carbsEditText.error = when {
+                    s.isNullOrEmpty() -> null
+                    v == null -> "Enter valid carbs"
+                    v < 0 || v > 500 -> "Carbs must be 0-500 g"
+                    else -> null
+                }
+            }
+        })
+
+        activityEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val v = s?.toString()?.toIntOrNull()
+                activityEditText.error = when {
+                    s.isNullOrEmpty() -> null
+                    v == null -> "Enter valid minutes"
+                    v < 0 || v > 600 -> "Activity must be 0-600"
+                    else -> null
+                }
+            }
+        })
     }
 
     private fun sendPredictionRequest(

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -10,65 +9,35 @@
     android:padding="24dp">
 
     <!-- Glucose Monitoring Button -->
-    <androidx.cardview.widget.CardView
+    <Button
+        android:id="@+id/btnGlucoseMonitor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="6dp"
-        android:layout_marginBottom="24dp">
-
-        <Button
-            android:id="@+id/btnGlucoseMonitor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Blood Glucose Monitor"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#1976D2"
+        android:text="Blood Glucose Monitor"
+        android:textSize="18sp"
+        android:layout_marginBottom="24dp"
         android:padding="16dp"
-        android:layout_margin="6dp"
         android:layout_gravity="center" />
-    </androidx.cardview.widget.CardView>
 
     <!-- Insulin Monitoring Button -->
-    <androidx.cardview.widget.CardView
+    <Button
+        android:id="@+id/btnInsulinMonitor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="6dp"
-        android:layout_marginBottom="24dp">
-
-        <Button
-            android:id="@+id/btnInsulinMonitor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Insulin Intake Monitor"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#1976D2"
-            android:padding="16dp"
-            android:layout_margin="6dp"
-            android:layout_gravity="center" />
-    </androidx.cardview.widget.CardView>
+        android:text="Insulin Intake Monitor"
+        android:textSize="18sp"
+        android:layout_marginBottom="24dp"
+        android:padding="16dp"
+        android:layout_gravity="center" />
 
     <!-- Home Button -->
-    <androidx.cardview.widget.CardView
+    <Button
+        android:id="@+id/btnHome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="6dp">
-
-        <Button
-            android:id="@+id/btnHome"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Go to Home"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#1976D2"
-            android:padding="16dp"
-            android:layout_margin="6dp"
-            android:layout_gravity="center" />
-    </androidx.cardview.widget.CardView>
+        android:text="Go to Home"
+        android:textSize="18sp"
+        android:padding="16dp"
+        android:layout_gravity="center" />
 
 </LinearLayout>

@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.play.services.cast.framework)
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation(libs.mediation.test.suite)
+    implementation(libs.billing.ktx)
 
     // Testing dependencies
     testImplementation(libs.junit)
