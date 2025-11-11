@@ -26,34 +26,6 @@ The app communicates with a **FastAPI-based backend** (Python) for AI dose predi
 | 💬 **Feedback & Support** | Built-in feedback feature for app improvement suggestions. |
 | 🔔 **Notifications System** | Daily summaries, missed entry alerts, and profile completion prompts. |
 
----
-
-## 🧱 **System Architecture**
-┌─────────────────────────────────────────────┐
-│ Android App (Kotlin) │
-│ • PredictorActivity.kt │
-│ • PredictorResultActivity.kt │
-│ • Graph Pages (InsulinGraph, GlucoseGraph) │
-│ • Notification & Reminder System │
-└─────────────────────────────────────────────┘
-│ ▲
-▼ │
-┌─────────────────────────────────────────────┐
-│ PHP-MySQL Backend (Server) │
-│ • User Registration / Login / Profile │
-│ • Data Fetch & Storage (glucose, insulin) │
-│ • PHP APIs (fetch_user_profile.php etc.) │
-└─────────────────────────────────────────────┘
-│ ▲
-▼ │
-┌─────────────────────────────────────────────┐
-│ FastAPI AI Backend (Python) │
-│ • Model: rf_insulin_pipeline.joblib │
-│ • Endpoint: /predict │
-│ • Uses Random Forest for insulin dosage │
-│ • Returns AI dose + correction + carb dose │
-└─────────────────────────────────────────────┘
-
 
 ---
 
@@ -69,33 +41,6 @@ The app communicates with a **FastAPI-based backend** (Python) for AI dose predi
 | **Database** | MySQL | Secure structured data storage |
 | **Notifications** | Android AlarmManager & WorkManager | Reminders and alerts |
 
----
-
-## 🧩 **Folder Structure**
-
-InsulinBudyy/
-├── app/
-│ ├── src/
-│ │ ├── main/java/com/saveetha/insulinbuddy/
-│ │ │ ├── PredictorActivity.kt
-│ │ │ ├── PredictorResultActivity.kt
-│ │ │ ├── InsulinGraphActivity.kt
-│ │ │ ├── GlucoseGraphActivity.kt
-│ │ │ ├── SubscriptionActivity.kt
-│ │ │ └── NotificationsActivity.kt
-│ │ ├── res/layout/
-│ │ │ ├── activity_predictor.xml
-│ │ │ ├── activity_predictor_result.xml
-│ │ │ ├── activity_insulin_graph.xml
-│ │ │ └── activity_glucose_graph.xml
-│ ├── build.gradle.kts
-│ └── proguard-rules.pro
-├── gradle/
-├── app.py ← FastAPI backend
-├── fetch_user_profile.php ← PHP backend
-├── rf_insulin_pipeline.joblib ← Trained model
-├── README.md
-└── .gitignore
 
 
 
